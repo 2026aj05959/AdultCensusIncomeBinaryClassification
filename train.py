@@ -53,8 +53,23 @@ def clean_data():
         raise ValueError("Expected 'is_canceled' to contain both labels 0 and 1.")
     X = data.drop(columns=[TARGET, *LEAKAGE_COLUMNS], errors="ignore").copy()
 
-    for column in X.select_dtypes(include=["object", "category"]).columns:
-        X[column] = X[column].astype("string").str.strip().replace({"?": pd.NA, "": pd.NA})
+    # Handle object, categorical, and pandas StringDtype columns without
+    # select_dtypes' newer compatibility warning. Keep missing values as np.nan
+    # because scikit-learn imputers do not reliably accept pandas.NA in objects.
+    for column in X.columns:
+        dtype = X[column].dtype
+        is_text = (
+            pd.api.types.is_object_dtype(dtype)
+            or pd.api.types.is_string_dtype(dtype)
+            or isinstance(dtype, pd.CategoricalDtype)
+        )
+        if not is_text:
+            continue
+        X[column] = X[column].map(
+            lambda value: value.strip() if isinstance(value, str) else value
+        ).astype(object)
+        X[column] = X[column].where(pd.notna(X[column]), np.nan)
+        X[column] = X[column].replace({"?": np.nan, "": np.nan})
 
     # Use a stratified 10,000-row subset for reasonable laptop and free-tier use.
     if len(X) > SAMPLE_SIZE:
