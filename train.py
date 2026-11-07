@@ -1,4 +1,4 @@
-"""Download Adult Census Income, train five classifiers, and save artifacts."""
+"""Train five classifiers on the Kaggle Hotel Booking Demand dataset."""
 
 from pathlib import Path
 import json
@@ -6,7 +6,6 @@ import json
 import joblib
 import numpy as np
 import pandas as pd
-from ucimlrepo import fetch_ucirepo
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
@@ -30,21 +29,32 @@ from sklearn.tree import DecisionTreeClassifier
 
 ROOT = Path(__file__).resolve().parent
 MODEL_DIR = ROOT / "model"
-TARGET = "income"
-POSITIVE_LABEL = ">50K"
+DATA_FILE = ROOT / "data" / "hotel_bookings.csv"
+TARGET = "is_canceled"
+POSITIVE_LABEL = 1
 RANDOM_STATE = 42
 SAMPLE_SIZE = 10_000  # Keeps local training and KNN evaluation manageable.
+LEAKAGE_COLUMNS = ["reservation_status", "reservation_status_date"]
 
 
 def clean_data():
-    """Fetch the UCI Adult dataset and normalize missing values and labels."""
-    adult = fetch_ucirepo(id=2)
-    X = adult.data.features.copy()
-    y_frame = adult.data.targets.copy()
-    y = y_frame.iloc[:, 0].astype(str).str.strip().str.replace(r"\.$", "", regex=True)
+    """Read the Kaggle CSV, use the cancellation target, and remove leakage fields."""
+    if not DATA_FILE.is_file():
+        raise FileNotFoundError(
+            f"Dataset not found: {DATA_FILE}\n"
+            "Download hotel_bookings.csv from Kaggle and put it in the project's data folder."
+        )
+    data = pd.read_csv(DATA_FILE)
+    if TARGET not in data.columns:
+        raise ValueError(f"The CSV must contain a '{TARGET}' column.")
+    data = data.dropna(subset=[TARGET]).copy()
+    y = pd.to_numeric(data[TARGET], errors="raise").astype(int)
+    if set(y.unique()) != {0, 1}:
+        raise ValueError("Expected 'is_canceled' to contain both labels 0 and 1.")
+    X = data.drop(columns=[TARGET, *LEAKAGE_COLUMNS], errors="ignore").copy()
 
     for column in X.select_dtypes(include=["object", "category"]).columns:
-        X[column] = X[column].astype("string").str.strip().replace("?", pd.NA)
+        X[column] = X[column].astype("string").str.strip().replace({"?": pd.NA, "": pd.NA})
 
     # Use a stratified 10,000-row subset for reasonable laptop and free-tier use.
     if len(X) > SAMPLE_SIZE:
@@ -56,7 +66,7 @@ def clean_data():
 
 def make_pipeline(model, numeric_features, categorical_features):
     # Dense one-hot output supports GaussianNB. The 10,000-row subset keeps
-    # memory use manageable; with 14 source features it remains practical.
+    # memory use manageable for this mixed categorical/numeric dataset.
     numeric = Pipeline(
         [
             ("imputer", SimpleImputer(strategy="median")),
@@ -126,8 +136,8 @@ def main():
         filename = name.lower().replace(" ", "_") + ".joblib"
         joblib.dump(pipeline, MODEL_DIR / filename)
         print(f"\n{name}\n" + "\n".join(f"  {k}: {v:.4f}" for k, v in scores.items()))
-        print("  Confusion matrix (rows=true, columns=predicted; labels <=50K, >50K):")
-        print(confusion_matrix(y_test, pipeline.predict(X_test), labels=["<=50K", ">50K"]))
+        print("  Confusion matrix (rows=true, columns=predicted; labels 0=not canceled, 1=canceled):")
+        print(confusion_matrix(y_test, pipeline.predict(X_test), labels=[0, 1]))
 
     # The app requires the target column in the uploaded test CSV.
     test_data = X_test.copy()
