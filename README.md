@@ -21,11 +21,11 @@ The goal is to identify which model best distinguishes canceled bookings from no
 
 | ML Model Name | Accuracy | AUC | Precision | Recall | F1 | MCC |
 |---|---:|---:|---:|---:|---:|---:|
-| Logistic Regression | 0.8090 | 0.8923 | 0.7292 | 0.7706 | 0.7493 | 0.5958 |
-| Decision Tree | 0.8110 | 0.8000 | 0.7410 | 0.7530 | 0.7470 | 0.5962 |
-| KNN | 0.7870 | 0.8565 | 0.7247 | 0.6856 | 0.7046 | 0.5387 |
-| Naive Bayes | 0.4670 | 0.5773 | 0.4085 | 0.9784 | 0.5763 | 0.2207 |
-| Support Vector Machine | 0.8320 | 0.9105 | 0.7725 | 0.7746 | 0.7736 | 0.6400 |
+| Logistic Regression | 0.8100 | 0.8941 | 0.7282 | 0.7772 | 0.7519 | 0.5990 |
+| Decision Tree | 0.8293 | 0.8213 | 0.7624 | 0.7832 | 0.7727 | 0.6362 |
+| KNN | 0.8088 | 0.8764 | 0.7527 | 0.7204 | 0.7362 | 0.5867 |
+| Naive Bayes | 0.4669 | 0.5777 | 0.4082 | 0.9767 | 0.5758 | 0.2185 |
+| Support Vector Machine | 0.8352 | 0.9096 | 0.7689 | 0.7935 | 0.7810 | 0.6491 |
 
 ## Observations on Model Performance
 
