@@ -21,20 +21,20 @@ The goal is to identify which model best distinguishes canceled bookings from no
 
 | ML Model Name | Accuracy | AUC | Precision | Recall | F1 | MCC |
 |---|---:|---:|---:|---:|---:|---:|
-| Logistic Regression | 0.8090 | 0.8923 | 0.7292 | 0.7706 | 0.7493 | 0.5958 |
-| Decision Tree | 0.8110 | 0.8000 | 0.7410 | 0.7530 | 0.7470 | 0.5962 |
-| KNN | 0.7870 | 0.8565 | 0.7247 | 0.6856 | 0.7046 | 0.5387 |
-| Naive Bayes | 0.4670 | 0.5773 | 0.4085 | 0.9784 | 0.5763 | 0.2207 |
-| Support Vector Machine | 0.8320 | 0.9105 | 0.7725 | 0.7746 | 0.7736 | 0.6400 |
+| Logistic Regression | 0.8100 | 0.8941 | 0.7282 | 0.7772 | 0.7519 | 0.5990 |
+| Decision Tree | 0.8293 | 0.8213 | 0.7624 | 0.7832 | 0.7727 | 0.6362 |
+| KNN | 0.8088 | 0.8764 | 0.7527 | 0.7204 | 0.7362 | 0.5867 |
+| Naive Bayes | 0.4669 | 0.5777 | 0.4082 | 0.9767 | 0.5758 | 0.2185 |
+| Support Vector Machine | 0.8352 | 0.9096 | 0.7689 | 0.7935 | 0.7810 | 0.6491 |
 
 ## Observations on Model Performance
 
 | ML Model Name | Observation about Model Performance |
 |---|---|
-| Logistic Regression | Performs well overall, with a strong AUC of 0.8923. Its recall (0.7706) is close to the SVM's, so it identifies canceled bookings at a similar rate. Its accuracy and precision are lower than the Decision Tree's and SVM's. |
-| Decision Tree | Achieves 0.8110 accuracy, slightly higher than Logistic Regression and KNN. Its MCC (0.5962) is almost the same as Logistic Regression's. Its AUC (0.8000) is lower, indicating weaker ability to distinguish the two classes across thresholds. |
-| KNN | Has a moderate AUC (0.8565), but lower accuracy (0.7870), recall (0.6856), and F1 (0.7046) than Logistic Regression, Decision Tree, and SVM. It misses more canceled bookings than these three models. |
-| Naive Bayes | Has the highest recall (0.9784), identifying nearly all canceled bookings. However, its accuracy (0.4670), precision (0.4085), AUC (0.5773), and MCC (0.2207) are low. Its high recall comes with many false cancellation predictions. |
-| Support Vector Machine | Gives the strongest overall results: it has the highest accuracy (0.8320), AUC (0.9105), precision (0.7725), F1 (0.7736), and MCC (0.6400). Its recall (0.7746) is also strong, though lower than Naive Bayes's. |
-| Overall Winner for this Dataset | Support Vector Machine. It leads on five of the six reported metrics and offers the best balance of precision, recall, and overall classification performance. If the priority were to catch nearly every canceled booking, Naive Bayes has the highest recall, but its many false positives make it weaker overall. |
+| Logistic Regression | Achieved 0.8100 accuracy and an AUC of 0.8941, indicating good ability to distinguish canceled from non-canceled bookings. Its recall for canceled bookings was 0.7772. The confusion matrix shows 12,831 false positives and 9,854 false negatives. |
+| Decision Tree | Achieved 0.8293 accuracy, 0.7624 precision, 0.7832 recall, an F1 score of 0.7727, and an MCC of 0.6362. It performs well overall, though its AUC of 0.8213 is lower than Logistic Regression, KNN, and SVM. Its confusion matrix shows 10,791 false positives and 9,589 false negatives. |
+| KNN | Achieved 0.8088 accuracy and an AUC of 0.8764. Its recall of 0.7204 is lower than the other models except for no model in this comparison, meaning it misses more canceled bookings. The confusion matrix shows 10,466 false positives and 12,365 false negatives. |
+| Naive Bayes | Achieved very high recall for canceled bookings (0.9767), missing only 1,032 cancellations. However, it incorrectly classified 62,610 non-canceled bookings as canceled. Its accuracy (0.4669), precision (0.4082), AUC (0.5777), and MCC (0.2185) are low, showing many false cancellation alerts and weak overall performance. |
+| Support Vector Machine | Achieved the best results across all six comparison metrics: accuracy (0.8352), AUC (0.9096), precision (0.7689), recall (0.7935), F1 (0.7810), and MCC (0.6491). Its confusion matrix shows 10,547 false positives and 9,133 false negatives. |
+| Overall Winner for This Dataset | Support Vector Machine. It has the highest value for each of the six reported metrics and provides the strongest overall balance when identifying canceled bookings while limiting false cancellation predictions. |
 
